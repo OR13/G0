@@ -2,7 +2,7 @@
   "name": "go-channel",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://G0.OR13.IO",
+  "homepage": "https://G0.OR13.IO",
   "dependencies": {
     "lodash": "^4.17.11",
     "react": "^16.6.1",
