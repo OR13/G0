@@ -63,9 +63,9 @@ class AlertView extends Component {
 }
 
 class PassView extends Component {
-  handleClick(e) {
+  handleClick = e => {
     this.props.board.pass();
-  }
+  };
   render() {
     return (
       <input
@@ -99,6 +99,7 @@ class ContainerView extends Component {
         </div>
 
         <div className="ContainerViewSidebar">
+          <a href="https://github.com/OR13/G0">Source Code</a>
           <AlertView board={this.state.board} />
           <PassView board={this.state.board} />
         </div>

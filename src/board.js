@@ -30,7 +30,7 @@ Board.prototype.create_board = function(size) {
  */
 Board.prototype.switch_player = function() {
   this.current_color =
-    this.current_color == Board.BLACK ? Board.WHITE : Board.BLACK;
+    this.current_color === Board.BLACK ? Board.WHITE : Board.BLACK;
 };
 
 /*
@@ -56,7 +56,7 @@ Board.prototype.play = function(i, j) {
   console.log("Played at " + i + ", " + j);
   this.attempted_suicide = this.in_atari = false;
 
-  if (this.board[i][j] != Board.EMPTY) return false;
+  if (this.board[i][j] !== Board.EMPTY) return false;
 
   var color = (this.board[i][j] = this.current_color);
   var captured = [];
@@ -66,22 +66,21 @@ Board.prototype.play = function(i, j) {
   var self = this;
   _.each(neighbors, function(n) {
     var state = self.board[n[0]][n[1]];
-    if (state != Board.EMPTY && state != color) {
+    if (state !== Board.EMPTY && state !== color) {
       var group = self.get_group(n[0], n[1]);
       console.log(group);
-      if (group["liberties"] == 0) captured.push(group);
-      else if (group["liberties"] == 1) atari = true;
+      if (group["liberties"] === 0) captured.push(group);
+      else if (group["liberties"] === 1) atari = true;
     }
   });
 
   // detect suicide
-  if (_.isEmpty(captured) && this.get_group(i, j)["liberties"] == 0) {
+  if (_.isEmpty(captured) && this.get_group(i, j)["liberties"] === 0) {
     this.board[i][j] = Board.EMPTY;
     this.attempted_suicide = true;
     return false;
   }
 
-  var self = this;
   _.each(captured, function(group) {
     _.each(group["stones"], function(stone) {
       self.board[stone[0]][stone[1]] = Board.EMPTY;
@@ -118,12 +117,18 @@ Board.prototype.get_adjacent_intersections = function(i, j) {
  */
 Board.prototype.get_group = function(i, j) {
   var color = this.board[i][j];
-  if (color == Board.EMPTY) return null;
+  if (color === Board.EMPTY) return null;
 
   var visited = {}; // for O(1) lookups
   var visited_list = []; // for returning
   var queue = [[i, j]];
   var count = 0;
+
+  let func = function(n) {
+    var state = self.board[n[0]][n[1]];
+    if (state === Board.EMPTY) count++;
+    if (state === color) queue.push([n[0], n[1]]);
+  };
 
   while (queue.length > 0) {
     var stone = queue.pop();
@@ -131,11 +136,8 @@ Board.prototype.get_group = function(i, j) {
 
     var neighbors = this.get_adjacent_intersections(stone[0], stone[1]);
     var self = this;
-    _.each(neighbors, function(n) {
-      var state = self.board[n[0]][n[1]];
-      if (state == Board.EMPTY) count++;
-      if (state == color) queue.push([n[0], n[1]]);
-    });
+
+    _.each(neighbors, func);
 
     visited[stone] = true;
     visited_list.push(stone);
