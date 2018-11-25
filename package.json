@@ -1,8 +1,8 @@
 {
-  "name": "go-channel",
+  "name": "go-game",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://G0.OR13.IO",
+  "homepage": "https://l1zz13.github.io/G0/",
   "dependencies": {
     "lodash": "^4.17.11",
     "react": "^16.6.1",
@@ -14,7 +14,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "yarn build",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {

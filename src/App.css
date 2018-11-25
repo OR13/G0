@@ -51,13 +51,13 @@
 
 .intersection.black,
 .intersection.white {
-    border: 1px solid #000;
+    border: 1px solid #000000;
 }
 
 .intersection.black {
-    background-color: #444;
+    background-color: #5632a8;
 }
 
 .intersection.white {
-    background-color: #eee;
+    background-color: #faef5c;
 }

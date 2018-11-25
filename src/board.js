@@ -7,7 +7,11 @@ var Board = function(size) {
   this.last_move_passed = false;
   this.in_atari = false;
   this.attempted_suicide = false;
+  this.history = [];
+  this.captures = [];
 };
+
+var numCaptured = [];
 
 Board.EMPTY = 0;
 Board.BLACK = 1;
@@ -40,6 +44,21 @@ Board.prototype.pass = function() {
   if (this.last_move_passed) this.end_game();
   this.last_move_passed = true;
   this.switch_player();
+};
+
+/*
+ * At any point in the game, a player can undo and let his opponent play
+ */
+Board.prototype.undo = function() {
+ if(this.history.length){
+  const lastState = this.history.pop();
+  this.board = lastState.board;
+  this.current_color = lastState.current_color;
+  console.log("board", this);
+ }
+  else{
+    console.log("no history");
+  }
 };
 
 /*
@@ -84,13 +103,23 @@ Board.prototype.play = function(i, j) {
   _.each(captured, function(group) {
     _.each(group["stones"], function(stone) {
       self.board[stone[0]][stone[1]] = Board.EMPTY;
+      numCaptured++; 
     });
   });
+  var newCaptured = numCaptured;
+  console.log(newCaptured);
+
 
   if (atari) this.in_atari = true;
 
   this.last_move_passed = false;
   this.switch_player();
+  const state = {
+    current_color: this.current_color,
+    board: _.cloneDeep(self.board)
+  }
+  this.history.push(state);
+  console.log("history", this.history);
   return true;
 };
 

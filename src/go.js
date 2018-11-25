@@ -55,8 +55,8 @@ class BoardView extends Component {
 class AlertView extends Component {
   render() {
     var text = "";
-    if (this.props.board.in_atari) text = "ATARI!";
-    else if (this.props.board.attempted_suicide) text = "SUICIDE!";
+    if (this.props.board.in_atari) text = "ATARI";
+    else if (this.props.board.attempted_suicide) text = "INVALID MOVE";
 
     return <div id="alerts">{text}</div>;
   }
@@ -78,6 +78,23 @@ class PassView extends Component {
   }
 }
 
+class UndoButton extends Component {
+  handleClick = e => {
+    this.props.board.undo();
+    this.props.doUpdate();
+  };
+  render() {
+    return (
+      <input
+        id="undo-btn"
+        type="button"
+        value="Undo"
+        onClick={this.handleClick}
+      />
+    );
+  }
+}
+
 class ContainerView extends Component {
   componentWillMount() {
     this.setState({
@@ -88,6 +105,13 @@ class ContainerView extends Component {
   onBoardUpdate() {
     this.setState({ board: this.props.board });
   }
+  
+  undo=()=>{
+    console.log('undo...')
+    this.state.board.undo();
+    this.onBoardUpdate();
+  }
+
   render() {
     return (
       <div className="ContainerView">
@@ -101,7 +125,10 @@ class ContainerView extends Component {
         <div className="ContainerViewSidebar">
           <a href="https://github.com/OR13/G0">Source Code</a>
           <AlertView board={this.state.board} />
-          <PassView board={this.state.board} />
+          <PassView board={this.state.board} /><br/><br/>
+
+          <button onClick={this.undo}>UNDOOOOO</button>
+          <UndoButton board={this.state.board} doUpdate={this.onBoardUpdate.bind(this)} />
         </div>
       </div>
     );
