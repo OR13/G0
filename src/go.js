@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+import _ from "lodash";
 import Board from "./board";
 
 var GRID_SIZE = 40;
@@ -98,18 +98,30 @@ class UndoButton extends Component {
 class ContainerView extends Component {
   componentWillMount() {
     this.setState({
-      board: this.props.board
+      board: this.props.board,
+      history: []
     });
   }
 
   onBoardUpdate() {
-    this.setState({ board: this.props.board });
+    let history = this.state.history;
+    history.push(_.cloneDeep(this.state.board));
+    this.setState({ board: this.state.board, history: history });
+    console.log("board was updated and component shall render")
   }
   
   undo=()=>{
     console.log('undo...')
-    this.state.board.undo();
-    this.onBoardUpdate();
+    var {history} = this.state;
+    if(history.length <= 1) {
+      console.log("nothing to undo");
+      return
+    }
+    console.log("popping:", history.pop());
+    var last = history[history.length-1];
+    console.log("set board to", last)
+    this.setState({board: last, history: history});
+    console.log("board was updated and component shall render")
   }
 
   render() {
@@ -123,12 +135,11 @@ class ContainerView extends Component {
         </div>
 
         <div className="ContainerViewSidebar">
-          <a href="https://github.com/OR13/G0">Source Code</a>
+          <a href="https://l1zz13.github.io/G0/">Source Code</a>
           <AlertView board={this.state.board} />
           <PassView board={this.state.board} /><br/><br/>
 
           <button onClick={this.undo}>UNDOOOOO</button>
-          <UndoButton board={this.state.board} doUpdate={this.onBoardUpdate.bind(this)} />
         </div>
       </div>
     );
