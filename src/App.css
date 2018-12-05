@@ -8,12 +8,12 @@
 }
 
 .ContainerViewSidebar{
-  float: right;
+  float: left;
 }
 
 #alerts {
-    height: 40px;
-    line-height: 40px;
+    height: 20px;
+    line-height: 20px;
 }
 
 #board {
@@ -54,10 +54,14 @@
     border: 1px solid #000000;
 }
 
-.intersection.black {
-    background-color: #5632a8;
+:root {
+--bgcolor1:#5632a8;
+--bgcolor2:#faef5c; 
 }
 
+.intersection.black {
+    background-color: var(--bgcolor1);
+}
 .intersection.white {
-    background-color: #faef5c;
+    background-color: var(--bgcolor2);
 }

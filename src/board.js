@@ -8,10 +8,12 @@ var Board = function(size) {
   this.in_atari = false;
   this.attempted_suicide = false;
   this.history = [];
-  this.captures = [];
+  this.captures = [numCapturedBlack, numCapturedWhite];
+  this.moveCount = 0;
 };
 
-var numCaptured = [];
+var numCapturedBlack = [];
+var numCapturedWhite = [];
 
 Board.EMPTY = 0;
 Board.BLACK = 1;
@@ -26,7 +28,18 @@ Board.prototype.create_board = function(size) {
     m[i] = [];
     for (var j = 0; j < size; j++) m[i][j] = Board.EMPTY;
   }
-  return m;
+  return m; 
+};
+
+Board.prototype.reset = function() {
+  this.current_color = Board.BLACK;
+  this.board = this.create_board(this.size);
+  this.last_move_passed = false;
+  this.in_atari = false;
+  this.attempted_suicide = false;
+  this.history = [];
+  this.captures = [];
+  this.moveCount = 0;
 };
 
 /*
@@ -51,10 +64,10 @@ Board.prototype.pass = function() {
  */
 Board.prototype.undo = function() {
  if(this.history.length){
-  const lastState = this.history.pop();
-  this.board = lastState.board;
-  this.current_color = lastState.current_color;
-  console.log("board", this);
+  const {board, current_color} = this.history.pop();
+  this.board = board;
+  this.current_color = current_color;
+  console.log("board undo", this);
  }
   else{
     console.log("no history");
@@ -68,15 +81,36 @@ Board.prototype.end_game = function() {
   console.log("GAME OVER");
 };
 
+var playHistoryX = [];
+var playHistoryY = [];
+
 /*
  * Attempt to place a stone at (i,j). Returns true iff the move was legal
  */
 Board.prototype.play = function(i, j) {
+  playHistoryX.push(i);
+  playHistoryY.push(j);
+  this.moveCount++;
+  var moveCount = this.moveCount - 1;
+  var moveKo = this.moveCount - 3;
+  console.log(this.moveCount);
   console.log("Played at " + i + ", " + j);
+  console.log(playHistoryX[moveCount] + ", " + playHistoryY[moveCount]);
+  console.log(playHistoryX[moveKo] + ", " + playHistoryY[moveKo]);
+  var abc = playHistoryX[moveCount];
+  var def = playHistoryX[moveKo];
+  var ghi = playHistoryY[moveCount];
+  var jkl = playHistoryY[moveKo];
+  if (this.moveCount >= 5 && abc === def && ghi === jkl) {
+    console.log("INVALID MOVE: KO RULE");
+    return false;
+  }
   this.attempted_suicide = this.in_atari = false;
 
-  if (this.board[i][j] !== Board.EMPTY) return false;
-
+  if (this.board[i][j] !== Board.EMPTY) {
+    console.log("INVALID MOVE"); 
+    return false;
+  }
   var color = (this.board[i][j] = this.current_color);
   var captured = [];
   var neighbors = this.get_adjacent_intersections(i, j);
@@ -103,11 +137,17 @@ Board.prototype.play = function(i, j) {
   _.each(captured, function(group) {
     _.each(group["stones"], function(stone) {
       self.board[stone[0]][stone[1]] = Board.EMPTY;
-      numCaptured++; 
-    });
+      if (color === 1) {
+        numCapturedBlack++;
+      } else if (color === 2) {
+        numCapturedWhite++;}
+        }
+    );
   });
-  var newCaptured = numCaptured;
-  console.log(newCaptured);
+  var newCapturedTotal = ["Captures by Black: " + numCapturedBlack, "Captures by White: " + numCapturedWhite];
+  if (numCapturedBlack >= 1 || numCapturedWhite >= 1) {
+    console.log(newCapturedTotal)} else {
+      console.log("")}
 
 
   if (atari) this.in_atari = true;
