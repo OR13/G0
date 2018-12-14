@@ -1,5 +1,5 @@
 .App {
-    padding: 16px;
+    padding: 20px;
 }
 
 
@@ -9,11 +9,13 @@
 
 .ContainerViewSidebar{
   float: left;
+  padding-left: 10px;
 }
 
 #alerts {
-    height: 20px;
-    line-height: 20px;
+    height: 30px;
+    line-height: 30px;
+    padding: 10px;
 }
 
 #board {
@@ -56,12 +58,16 @@
 
 :root {
 --bgcolor1:#5632a8;
---bgcolor2:#faef5c; 
+--bgcolor2:#fbfbca; 
+--bgimage1: "";
+--bgimage2: "";
 }
 
 .intersection.black {
     background-color: var(--bgcolor1);
+    background-image: var(--bgimage1);
 }
 .intersection.white {
     background-color: var(--bgcolor2);
+    background-image: var(--bgimage2);
 }

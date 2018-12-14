@@ -8,7 +8,9 @@ var Board = function(size) {
   this.in_atari = false;
   this.attempted_suicide = false;
   this.history = [];
-  this.captures = [numCapturedBlack, numCapturedWhite];
+  this.captures = [];
+  this.capturesArrayBlack = [];
+  this.capturesArrayWhite = [];
   this.moveCount = 0;
 };
 
@@ -81,6 +83,19 @@ Board.prototype.end_game = function() {
   console.log("GAME OVER");
 };
 
+Board.prototype.is_valid_state = function(history) {
+  console.log("history length " + history.length);
+  const state = JSON.stringify(this.board);
+  console.log("Im checking if current state is valid");
+  for (var n = 0; this.moveCount > 0 && n < history.length; n=n+1) {
+    if (JSON.stringify(history[n].board) === state) {
+      console.log("INVALIDDDD");
+      return false;}
+  }
+  return true;
+};
+
+
 var playHistoryX = [];
 var playHistoryY = [];
 
@@ -91,24 +106,15 @@ Board.prototype.play = function(i, j) {
   playHistoryX.push(i);
   playHistoryY.push(j);
   this.moveCount++;
-  var moveCount = this.moveCount - 1;
-  var moveKo = this.moveCount - 3;
   console.log(this.moveCount);
   console.log("Played at " + i + ", " + j);
-  console.log(playHistoryX[moveCount] + ", " + playHistoryY[moveCount]);
-  console.log(playHistoryX[moveKo] + ", " + playHistoryY[moveKo]);
-  var abc = playHistoryX[moveCount];
-  var def = playHistoryX[moveKo];
-  var ghi = playHistoryY[moveCount];
-  var jkl = playHistoryY[moveKo];
-  if (this.moveCount >= 5 && abc === def && ghi === jkl) {
-    console.log("INVALID MOVE: KO RULE");
+  this.attempted_suicide = this.in_atari = false;
+  if (playHistoryX[playHistoryX.length - 1]=== playHistoryX[playHistoryX.length-2] && playHistoryY[playHistoryY.length - 1]=== playHistoryY[playHistoryY.length-2]) {
+    console.log("ko rule");
     return false;
   }
-  this.attempted_suicide = this.in_atari = false;
-
   if (this.board[i][j] !== Board.EMPTY) {
-    console.log("INVALID MOVE"); 
+    console.log("INVALID MOVE");
     return false;
   }
   var color = (this.board[i][j] = this.current_color);
@@ -127,6 +133,9 @@ Board.prototype.play = function(i, j) {
     }
   });
 
+var turnBlack = 0;
+var turnWhite = 0;
+
   // detect suicide
   if (_.isEmpty(captured) && this.get_group(i, j)["liberties"] === 0) {
     this.board[i][j] = Board.EMPTY;
@@ -139,16 +148,18 @@ Board.prototype.play = function(i, j) {
       self.board[stone[0]][stone[1]] = Board.EMPTY;
       if (color === 1) {
         numCapturedBlack++;
+        turnBlack++;
       } else if (color === 2) {
-        numCapturedWhite++;}
+        numCapturedWhite++;
+        turnWhite++;}
         }
     );
   });
-  var newCapturedTotal = ["Captures by Black: " + numCapturedBlack, "Captures by White: " + numCapturedWhite];
-  if (numCapturedBlack >= 1 || numCapturedWhite >= 1) {
-    console.log(newCapturedTotal)} else {
-      console.log("")}
-
+  this.capturesArrayBlack.push(turnBlack);
+  this.capturesArrayWhite.push(turnWhite);
+  console.log("Array, ", this.capturesArray);
+  var newCapturedTotal = ["Captures by Black: " + numCapturedBlack, ", Captures by White: " + numCapturedWhite];
+    console.log(newCapturedTotal)
 
   if (atari) this.in_atari = true;
 
@@ -161,7 +172,7 @@ Board.prototype.play = function(i, j) {
   this.history.push(state);
   console.log("history", this.history);
   return true;
-};
+}
 
 /*
  * Given a board position, returns a list of [i,j] coordinates representing
