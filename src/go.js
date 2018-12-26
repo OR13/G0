@@ -55,16 +55,6 @@ class BoardView extends Component {
   }
 }
 
-class AlertView extends Component {
-  render() {
-
-    var text = "";
-    if (this.props.board.in_atari) text = "ATARI";
-    else if (this.props.board.attempted_suicide) text = "INVALID MOVE";
-
-    return <div id="alerts">{text}</div>;
-  }
-}
 
 class PassView extends Component {
   handleClick = e => {  
@@ -104,9 +94,18 @@ class NewGame extends Component {
 
 class CapturesView extends Component {
   render() {
-    var textCaptures = "Captures by Black: " + this.props.board.capturesArrayBlack.reduce((a,b) => a + b, 0) + ", Captures by White: " + this.props.board.capturesArrayWhite.reduce((a,b) => a + b, 0);
+    var textCaptures = "Captures by Black: " + this.props.board.capturesArrayBlack.reduce((a,b) => a + b, 0);
     return (
     <div id="alerts">&nbsp;{textCaptures}&nbsp;</div>
+    );
+  }
+}
+
+class CapturesView2 extends Component {
+  render() {
+    var textCaptures2 = "Captures by White: " + this.props.board.capturesArrayWhite.reduce((a,b) => a + b, 0);
+    return (
+    <div id="alerts">&nbsp;{textCaptures2}&nbsp;</div>
     );
   }
 }
@@ -137,7 +136,7 @@ class ContainerView extends Component {
   }
 
   undo=()=>{
-    console.log('undo...')
+    
     var {history} = this.state;
     if(history.length <= 1) {
       window.location.reload(false);
@@ -150,7 +149,10 @@ class ContainerView extends Component {
     this.setState({board: last, history: history});
     this.props.board.capturesArrayBlack.pop();
     this.props.board.capturesArrayWhite.pop();
+    this.moveCount--;
     console.log("board was updated and component shall render")
+
+    console.log('undo...', this.state.history, this.state.board)
   }
 
   render() {
@@ -165,33 +167,33 @@ class ContainerView extends Component {
 
         <div className="ContainerViewSidebar">
           <a href="https://github.com/L1zz13/G0/">Source Code</a>
-          <AlertView board={this.state.board} />
           <CapturesView board={this.state.board} />
+          <CapturesView2 board={this.state.board} />
           <PassView board={this.state.board} /><br/><br/>
           <NewGame board={this.state.board} onReset={this.onBoardUpdate.bind(this)} /><br/><br/>
           <button onClick={this.undo}>Undo</button><br/><br/>
 
-          <p>Select Player 1 Color: &nbsp;
+          <p>Select Player 1 Color: <br></br>
           <select name="playerOneColor" onChange={(e)=>{
             console.log(e.target.value)
             window._PLAYER_ONE_COLOR = e.target.value;
           }}>
-          <option name="default" value="#5632a8">default</option><option name="black" value="#000000">black</option><option name="red" value="#ff0000">red</option><option name="blue" value="#0000ff">blue</option></select></p>
-          <p>Select Player 2 Color: &nbsp;
+          <option name="default" value="#5632a8">default</option><option name="black" value="#000000">black</option><option name="red" value="#D0112E">red</option><option name="blue" value="#4B98F9">blue</option><option name="orange" value="#FD9D16">orange</option></select></p>
+          <p>Select Player 2 Color: <br></br>
           <select name="playerTwoColor" onChange={(e)=>{
             console.log(e)
             window._PLAYER_TWO_COLOR = e.target.value;
 
           }}>
-          <option name="default" value="#faef5c">default</option><option name="default" value="#ffffff">white</option><option name="pink" value="#ffb6c1">pink</option><option name="yellow" value="#fff000">yellow</option></select></p>
+          <option name="default" value="#fbfbca">default</option><option name="default" value="#ffffff">white</option><option name="pale blue" value="#C1F0FE">pale blue</option><option name="lavender" value="#E4C2FD">lavender</option><option name="green" value="#A1FD98">green</option></select></p>
          
-          <p>Select Player 1 Emoji: &nbsp;
+          <p>Select Player 1 Emoji: <br/>
           <select name="playerOneImage" onChange={(e)=>{
             console.log(e.target.value)
             window._PLAYER_ONE_IMAGE = e.target.value;
           }}>
           <option name="default" value="">none</option><option name="1" value="url('http://pages.kwanzoo.com/rs/358-EUI-570/images/pusheen-cat-donuts-black-small-2.png')">donut pusheen</option><option name="2" value="url('http://pages.kwanzoo.com/rs/358-EUI-570/images/pusheen-squid-black-SMALL.png')">squid pusheen</option><option name="3" value="url('http://pages.kwanzoo.com/rs/358-EUI-570/images/happyface-black-small-3.png')">happy face</option></select> </p>
-          <p>Select Player 2 Emoji: &nbsp;
+          <p>Select Player 2 Emoji: <br/>
           <select name="playerTwoImage" onChange={(e)=>{
             console.log(e.target.value)
             window._PLAYER_TWO_IMAGE = e.target.value;

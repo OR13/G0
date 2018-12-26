@@ -2,6 +2,9 @@
     padding: 20px;
 }
 
+body {
+    background-image: url("http://pages.kwanzoo.com/rs/358-EUI-570/images/background-6-789.png");
+   }
 
 .ContainerViewBoard{
   float: left;
@@ -9,13 +12,13 @@
 
 .ContainerViewSidebar{
   float: left;
-  padding-left: 10px;
+  padding-left: 20px;
 }
 
 #alerts {
     height: 30px;
     line-height: 30px;
-    padding: 10px;
+    padding: 5px;
 }
 
 #board {
@@ -45,15 +48,16 @@
     height: 40px;
     display: block;
     content: "";
-    left: 18px;
+    left: 20px;
     top: 0px;
     position: absolute;
     z-index: -1;
+
 }
 
 .intersection.black,
 .intersection.white {
-    border: 1px solid #000000;
+    border: 3px solid #242424;
 }
 
 :root {

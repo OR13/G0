@@ -12,10 +12,9 @@ var Board = function(size) {
   this.capturesArrayBlack = [];
   this.capturesArrayWhite = [];
   this.moveCount = 0;
+  this.moveCountArray = [];
+  this.last_move_undo = false;
 };
-
-var numCapturedBlack = [];
-var numCapturedWhite = [];
 
 Board.EMPTY = 0;
 Board.BLACK = 1;
@@ -42,6 +41,8 @@ Board.prototype.reset = function() {
   this.history = [];
   this.captures = [];
   this.moveCount = 0;
+  this.moveCountArray = [];
+  this.last_move_undo = false;
 };
 
 /*
@@ -84,17 +85,16 @@ Board.prototype.end_game = function() {
 };
 
 Board.prototype.is_valid_state = function(history) {
-  console.log("history length " + history.length);
+  console.log("history length " + this.history.length);
   const state = JSON.stringify(this.board);
   console.log("Im checking if current state is valid");
-  for (var n = 0; this.moveCount > 0 && n < history.length; n=n+1) {
+  for (var n = 0; this.moveCountArray[this.moveCountArray.length - 1] > this.moveCountArray[this.moveCountArray.length - 2] && this.moveCount > 0 && n < history.length; n=n+1) {
     if (JSON.stringify(history[n].board) === state) {
       console.log("INVALIDDDD");
       return false;}
   }
   return true;
 };
-
 
 var playHistoryX = [];
 var playHistoryY = [];
@@ -107,10 +107,12 @@ Board.prototype.play = function(i, j) {
   playHistoryY.push(j);
   this.moveCount++;
   console.log(this.moveCount);
+  this.moveCountArray.push(this.moveCount);
   console.log("Played at " + i + ", " + j);
   this.attempted_suicide = this.in_atari = false;
   if (playHistoryX[playHistoryX.length - 1]=== playHistoryX[playHistoryX.length-2] && playHistoryY[playHistoryY.length - 1]=== playHistoryY[playHistoryY.length-2]) {
     console.log("ko rule");
+    this.moveCount--;
     return false;
   }
   if (this.board[i][j] !== Board.EMPTY) {
@@ -147,19 +149,14 @@ var turnWhite = 0;
     _.each(group["stones"], function(stone) {
       self.board[stone[0]][stone[1]] = Board.EMPTY;
       if (color === 1) {
-        numCapturedBlack++;
         turnBlack++;
       } else if (color === 2) {
-        numCapturedWhite++;
         turnWhite++;}
         }
     );
   });
   this.capturesArrayBlack.push(turnBlack);
   this.capturesArrayWhite.push(turnWhite);
-  console.log("Array, ", this.capturesArray);
-  var newCapturedTotal = ["Captures by Black: " + numCapturedBlack, ", Captures by White: " + numCapturedWhite];
-    console.log(newCapturedTotal)
 
   if (atari) this.in_atari = true;
 
@@ -172,7 +169,7 @@ var turnWhite = 0;
   this.history.push(state);
   console.log("history", this.history);
   return true;
-}
+};
 
 /*
  * Given a board position, returns a list of [i,j] coordinates representing
