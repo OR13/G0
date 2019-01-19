@@ -17,7 +17,7 @@ export default withHandlers({
       }
     });
     await room.sendTo(opponent, message);
-    alert("dto saved.");
+    // alert("dto saved.");
   },
   deleteDTO: () => async ({ db, room, opponent }) => {
     await db.del("dto:latest");
@@ -26,7 +26,7 @@ export default withHandlers({
       payload: {}
     });
     await room.sendTo(opponent, message);
-    alert("dto deleted.");
+    // alert("dto deleted.");
   },
 
   sendGameInvite: ({ gameInvitationAccepted }) => async ({ room, payload }) => {

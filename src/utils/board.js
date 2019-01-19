@@ -100,9 +100,9 @@ class Board {
       const { board, current_color } = this.history.pop();
       this.board = board;
       this.current_color = current_color;
-      console.log("board undo", this);
+      // console.log("board undo", this);
     } else {
-      console.log("no history");
+      // console.log("no history");
     }
   };
 
@@ -110,13 +110,13 @@ class Board {
    * Called when the game ends (both players passed)
    */
   end_game = function() {
-    console.log("GAME OVER");
+    // console.log("GAME OVER");
   };
 
   is_valid_state = function(history) {
-    console.log("history length " + this.history.length);
+    // console.log("history length " + this.history.length);
     const state = JSON.stringify(this.board);
-    console.log("Im checking if current state is valid");
+    // console.log("Im checking if current state is valid");
     for (
       var n = 0;
       this.moveCountArray[this.moveCountArray.length - 1] >
@@ -126,7 +126,7 @@ class Board {
       n = n + 1
     ) {
       if (JSON.stringify(history[n].board) === state) {
-        console.log("INVALIDDDD");
+        // console.log("INVALIDDDD");
         return false;
       }
     }
@@ -140,9 +140,9 @@ class Board {
     playHistoryX.push(i);
     playHistoryY.push(j);
     this.moveCount++;
-    console.log(this.moveCount);
+    // console.log(this.moveCount);
     this.moveCountArray.push(this.moveCount);
-    console.log("Played at " + i + ", " + j);
+    // console.log("Played at " + i + ", " + j);
     this.attempted_suicide = this.in_atari = false;
     if (
       playHistoryX[playHistoryX.length - 1] ===
@@ -150,12 +150,12 @@ class Board {
       playHistoryY[playHistoryY.length - 1] ===
         playHistoryY[playHistoryY.length - 2]
     ) {
-      console.log("ko rule");
+      // console.log("ko rule");
       this.moveCount--;
       return false;
     }
     if (this.board[i][j] !== Board.EMPTY) {
-      console.log("INVALID MOVE");
+      // console.log("INVALID MOVE");
       return false;
     }
     var color = (this.board[i][j] = this.current_color);
@@ -168,7 +168,7 @@ class Board {
       var state = self.board[n[0]][n[1]];
       if (state !== Board.EMPTY && state !== color) {
         var group = self.get_group(n[0], n[1]);
-        console.log(group);
+        // console.log(group);
         if (group["liberties"] === 0) captured.push(group);
         else if (group["liberties"] === 1) atari = true;
       }
@@ -206,7 +206,7 @@ class Board {
       board: _.cloneDeep(self.board)
     };
     this.history.push(state);
-    console.log("history", this.history);
+    // console.log("history", this.history);
     return true;
   };
 

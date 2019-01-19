@@ -14,6 +14,8 @@ import Board from "../../utils/board";
 
 const Room = require("ipfs-pubsub-room");
 
+const BOARD_SIZE = 5;
+
 class GamePage extends Component {
   state = {
     ready: false
@@ -32,9 +34,9 @@ class GamePage extends Component {
     this.db = await orbitdb.open(orbitDBAddress);
     await this.db.load();
     const dto = await this.db.get("dto:latest")[0];
-    console.log("loaded dto: ", dto);
+    // console.log("loaded dto: ", dto);
     if (dto === undefined) {
-      this.board = new Board({ size: 5 });
+      this.board = new Board({ size: BOARD_SIZE });
       const dto = this.board.getDataTransferObject();
       await this.db.put({
         _id: "dto:latest",
@@ -43,31 +45,36 @@ class GamePage extends Component {
       });
     } else {
       this.board = new Board(dto);
-      console.log("though it was loaded, it does not render...", this.board);
+      // console.log("though it was loaded, it does not render...", this.board);
     }
 
     room.on("peer joined", async peer => {
-      console.log("Peer joined the room", peer);
+      // console.log("Peer joined the room", peer);
     });
 
     room.on("peer left", peer => {
-      console.log("Peer left...", peer);
+      // console.log("Peer left...", peer);
     });
 
     // now started to listen to room
     room.on("subscribed", () => {
-      console.log("Now connected!");
+      // console.log("Now connected!");
     });
 
     room.on("message", async message => {
       const { action, payload } = JSON.parse(message.data);
-      console.log("message...", message, payload);
+      console.log("message...", message, action, payload);
       if (action === "game:dto:saved") {
-        // console.log(payload);
         this.board = new Board(payload.dto);
         this.setState({
           board: this.board
-        })
+        });
+      }
+      if (action === "game:dto:deleted") {
+        this.board = new Board(BOARD_SIZE);
+        this.setState({
+          board: this.board
+        });
       }
     });
 
@@ -96,7 +103,7 @@ class GamePage extends Component {
     if (!ready) {
       return <CircularProgress />;
     }
-    console.log(this.board);
+    // console.log(this.board);
     return (
       <div className="GamePage">
         <Button
@@ -131,7 +138,6 @@ class GamePage extends Component {
             deleteDTO({
               room: this.room,
               db: this.db,
-
               opponent
             });
           }}
@@ -142,6 +148,12 @@ class GamePage extends Component {
           You are {colors[you]}, {opponent.substring(0, 5) + "..."} is{" "}
           {colors[opponent]}
         </h3>
+        <h3>
+          It is your{" "}
+          {this.board.current_color === 1 && colors[you] === "black"
+            ? "turn"
+            : "opponent turn"}
+        </h3>
         <BoardView
           board={this.board}
           onPlay={board => {
@@ -149,7 +161,7 @@ class GamePage extends Component {
             // really any state update will cause a re-render after assignment..
             this.setState({
               board
-            })
+            });
             saveDTO({
               room: this.room,
               db: this.db,
