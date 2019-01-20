@@ -6,6 +6,14 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+
+const peerIdToProfileAttribute = (players, peerId, attr) => {
+  if (players && players[peerId]) {
+    return players[peerId][attr];
+  }
+  return "";
+};
+
 class NewGameDialog extends React.Component {
   state = {
     open: false
@@ -15,7 +23,7 @@ class NewGameDialog extends React.Component {
     if (
       nextProps.go.invitation &&
       nextProps.go.invitation.from &&
-      !nextProps.go.game
+      !Object.keys(nextProps.go.game).length
     ) {
       this.setState({
         from: nextProps.go.invitation.from,
@@ -42,7 +50,7 @@ class NewGameDialog extends React.Component {
           <DialogTitle id="alert-dialog-title">{"Game Invite"}</DialogTitle>
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Invitation from {from}.
+              Invitation from {peerIdToProfileAttribute(go.players, from, 'playerName')}.
             </DialogContentText>
           </DialogContent>
           <DialogActions>

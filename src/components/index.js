@@ -12,3 +12,8 @@ export { default as CapturesView } from "./CapturesView";
 export { default as ContainerView } from "./ContainerView";
 
 export { default as NewGameDialog } from "./NewGameDialog";
+
+export { default as IPFSPubSubChat } from "./IPFSPubSubChat";
+
+export { default as PageNavigation } from "./PageNavigation";
+export { default as PlayerProfile } from "./PlayerProfile";

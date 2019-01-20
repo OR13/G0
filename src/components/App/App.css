@@ -3,16 +3,16 @@
 }
 
 body {
-    /* background-image: url("http://pages.kwanzoo.com/rs/358-EUI-570/images/background-6-789.png"); */
-   }
-
-.ContainerViewBoard{
-  float: left;
+    background-image: url("/bg.png");
 }
 
-.ContainerViewSidebar{
-  float: left;
-  padding-left: 20px;
+.ContainerViewBoard {
+    float: left;
+}
+
+.ContainerViewSidebar {
+    float: left;
+    padding-left: 20px;
 }
 
 #alerts {
@@ -52,25 +52,25 @@ body {
     top: 0px;
     position: absolute;
     z-index: -1;
-
 }
 
 .intersection.black,
 .intersection.white {
-    border: 3px solid #242424;
+    border: 1px solid #242424;
 }
 
 :root {
---bgcolor1:#5632a8;
---bgcolor2:#fbfbca; 
---bgimage1: "";
---bgimage2: "";
+    --bgcolor1: #5632a8;
+    --bgcolor2: #fbfbca;
+    --bgimage1: "";
+    --bgimage2: "";
 }
 
 .intersection.black {
     background-color: var(--bgcolor1);
     background-image: var(--bgimage1);
 }
+
 .intersection.white {
     background-color: var(--bgcolor2);
     background-image: var(--bgimage2);

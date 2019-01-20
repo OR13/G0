@@ -5,6 +5,20 @@ export default withHandlers({
   navigateTo: () => async ({ path }) => {
     history.push(path);
   },
+  sendMessage: () => async ({ room, payload }) => {
+    const message = JSON.stringify({
+      action: "chat:message:sent",
+      payload
+    });
+    await room.broadcast(message);
+  },
+  updatePlayerProfile: () => async ({ room, payload }) => {
+    const message = JSON.stringify({
+      action: "lobby:player:profileUpdated",
+      payload
+    });
+    await room.broadcast(message);
+  },
   saveDTO: () => async ({ db, room, dto, opponent }) => {
     await db.put({
       _id: "dto:latest",
@@ -19,16 +33,17 @@ export default withHandlers({
     await room.sendTo(opponent, message);
     // alert("dto saved.");
   },
-  deleteDTO: () => async ({ db, room, opponent }) => {
+  deleteDTO: () => async ({ db, room, dto, opponent }) => {
     await db.del("dto:latest");
     const message = JSON.stringify({
       action: "game:dto:deleted",
-      payload: {}
+      payload: {
+        dto
+      }
     });
     await room.sendTo(opponent, message);
     // alert("dto deleted.");
   },
-
   sendGameInvite: ({ gameInvitationAccepted }) => async ({ room, payload }) => {
     const message = JSON.stringify({
       action: "game:invite",

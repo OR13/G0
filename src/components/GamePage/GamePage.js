@@ -1,14 +1,12 @@
 import React, { Component } from "react";
 
 import Button from "@material-ui/core/Button";
+import Paper from "@material-ui/core/Paper";
 import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { getOrbitDB } from "../../utils/orbit-helpers";
 
-import {
-  // ContainerView,
-  BoardView
-} from "../index";
+import { PageNavigation, PlayerProfile, BoardView } from "../index";
 
 import Board from "../../utils/board";
 
@@ -20,12 +18,19 @@ const playerColorStringToInt = color => {
   return color === "black" ? 1 : 2;
 };
 
+const peerIdToProfileAttribute = (players, peerId, attr) => {
+  if (players && players[peerId]) {
+    return players[peerId][attr];
+  }
+  return "";
+};
+
 class GamePage extends Component {
   state = {
     ready: false
   };
   async componentWillMount() {
-    const { router, selfPeerInfo } = this.props;
+    const { router, selfPeerInfo, playerProfileUpdated } = this.props;
     const { pathname } = router.location;
     const orbitDBAddress = pathname.replace("/game", "");
     const roomName = orbitDBAddress.split("/")[3];
@@ -35,6 +40,7 @@ class GamePage extends Component {
     const room = Room(orbitdb._ipfs, roomName);
     this.orbitdb = orbitdb;
     this.room = room;
+    this.peerId = peerInfo.id;
     this.db = await orbitdb.open(orbitDBAddress);
     await this.db.load();
     const dto = await this.db.get("dto:latest")[0];
@@ -68,6 +74,13 @@ class GamePage extends Component {
     room.on("message", async message => {
       const { action, payload } = JSON.parse(message.data);
       console.log("message...", message, action, payload);
+
+      if (action === "lobby:player:profileUpdated") {
+        playerProfileUpdated({
+          ...payload
+        });
+      }
+
       if (action === "game:dto:saved") {
         this.board = new Board(payload.dto);
         this.setState({
@@ -75,7 +88,7 @@ class GamePage extends Component {
         });
       }
       if (action === "game:dto:deleted") {
-        this.board = new Board(BOARD_SIZE);
+        this.board = new Board(payload.dto);
         this.setState({
           board: this.board
         });
@@ -101,80 +114,88 @@ class GamePage extends Component {
     }, 1 * 1000);
   }
   render() {
-    const { navigateTo, saveDTO, deleteDTO } = this.props;
+    const { go, saveDTO, deleteDTO } = this.props;
     const { ready, colors, you, opponent } = this.state;
 
     if (!ready) {
       return <CircularProgress />;
     }
-    // console.log(this.board);
+
     return (
       <div className="GamePage">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={async () => {
-            navigateTo({ path: "/lobby" });
-          }}
-        >
-          Lobby
-        </Button>
-        &nbsp;
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={async () => {
-            saveDTO({
-              room: this.room,
-              db: this.db,
-              dto: this.board.getDataTransferObject(),
-              opponent
-            });
-          }}
-        >
-          Save DTO
-        </Button>
-        &nbsp;
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={async () => {
-            deleteDTO({
-              room: this.room,
-              db: this.db,
-              opponent
-            });
-          }}
-        >
-          DELETE DTO
-        </Button>
-        <h3>
-          You are {colors[you]}, {opponent.substring(0, 5) + "..."} is{" "}
-          {colors[opponent]}
-        </h3>
-        <h3>
-          It is your{" "}
-          {this.board.current_color === playerColorStringToInt(colors[you])
-            ? "turn"
-            : "opponent turn"}
-        </h3>
-        <BoardView
-          currentPlayer={playerColorStringToInt(colors[you])}
-          board={this.board}
-          onPlay={board => {
-            this.board = board;
-            // really any state update will cause a re-render after assignment..
-            this.setState({
-              board
-            });
-            saveDTO({
-              room: this.room,
-              db: this.db,
-              dto: this.board.getDataTransferObject(),
-              opponent
-            });
-          }}
-        />
+        <PageNavigation>
+          <Paper style={{ padding: "16px", marginBottom: "16px" }}>
+            <PlayerProfile room={this.room} peerId={this.peerId} />
+          </Paper>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={async () => {
+              saveDTO({
+                room: this.room,
+                db: this.db,
+                dto: this.board.getDataTransferObject(),
+                opponent
+              });
+            }}
+          >
+            Save Game
+          </Button>
+          &nbsp;
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={async () => {
+              this.board = new Board({ size: BOARD_SIZE });
+              const dto = this.board.getDataTransferObject();
+              await this.db.put({
+                _id: "dto:latest",
+                name: "dto:latest",
+                ...dto
+              });
+              this.setState({
+                board: this.board
+              });
+
+              deleteDTO({
+                room: this.room,
+                db: this.db,
+                dto,
+                opponent
+              });
+            }}
+          >
+            Reset Game
+          </Button>
+          <h3>
+            You are {colors[you]},{" "}
+            {peerIdToProfileAttribute(go.players, opponent, "playerName")} is{" "}
+            {colors[opponent]}
+          </h3>
+          <h3>
+            It is {" "}
+            {this.board.current_color === playerColorStringToInt(colors[you])
+              ? "your turn"
+              : `${peerIdToProfileAttribute(go.players, opponent, "playerName")}'s turn`}
+          </h3>
+          <BoardView
+            currentPlayer={playerColorStringToInt(colors[you])}
+            board={this.board}
+            onPlay={board => {
+              this.board = board;
+              // really any state update will cause a re-render after assignment..
+              this.setState({
+                board
+              });
+              saveDTO({
+                room: this.room,
+                db: this.db,
+                dto: this.board.getDataTransferObject(),
+                opponent
+              });
+            }}
+          />
+        </PageNavigation>
       </div>
     );
   }
