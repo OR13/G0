@@ -6,6 +6,10 @@ import { GRID_SIZE } from "../../constants";
 
 class BoardIntersection extends Component {
   handleClick = () => {
+    if (this.props.currentPlayer !== this.props.board.current_color){
+      console.log('not your turn!!!')
+      return;
+    }
     if (this.props.board.play(this.props.row, this.props.col))
       this.props.onPlay(this.props.board);
   };

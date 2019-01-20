@@ -18,6 +18,7 @@ class BoardView extends Component {
               color: board.board[i][j],
               row: i,
               col: j,
+              currentPlayer: this.props.currentPlayer,
               onPlay: this.props.onPlay
             }}
           />

@@ -16,6 +16,10 @@ const Room = require("ipfs-pubsub-room");
 
 const BOARD_SIZE = 5;
 
+const playerColorStringToInt = color => {
+  return color === "black" ? 1 : 2;
+};
+
 class GamePage extends Component {
   state = {
     ready: false
@@ -150,11 +154,12 @@ class GamePage extends Component {
         </h3>
         <h3>
           It is your{" "}
-          {this.board.current_color === 1 && colors[you] === "black"
+          {this.board.current_color === playerColorStringToInt(colors[you])
             ? "turn"
             : "opponent turn"}
         </h3>
         <BoardView
+          currentPlayer={playerColorStringToInt(colors[you])}
           board={this.board}
           onPlay={board => {
             this.board = board;
@@ -170,7 +175,6 @@ class GamePage extends Component {
             });
           }}
         />
-        {/* <ContainerView board={this.board} /> */}
       </div>
     );
   }
